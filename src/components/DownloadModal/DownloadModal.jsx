@@ -1,43 +1,38 @@
-import React, { useState } from 'react';
-import { X, Download, Monitor } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Download, Loader2 } from 'lucide-react';
+import { getAppRelease } from '../../appwrite/database';
 import './DownloadModal.css';
 
 // ── Platform detection ──────────────────────────────────────────────────────
 function detectOS() {
-  const ua  = navigator.userAgent.toLowerCase();
-  const plat = (navigator.userAgentData?.platform || navigator.platform || '').toLowerCase();
-  if (ua.includes('win') || plat.includes('win'))   return 'windows';
-  if (ua.includes('mac') || plat.includes('mac'))   return 'mac';
-  if (ua.includes('linux') || plat.includes('linux')) return 'linux';
-  return null; // unknown
+  const ua   = navigator.userAgent;
+  const plat = (navigator.userAgentData?.platform || navigator.platform || '');
+  if (/Mac|iPhone|iPad|iPod/i.test(ua) || /Mac/i.test(plat))   return 'mac';
+  if (/Win/i.test(ua) || /Win/i.test(plat))                     return 'windows';
+  if (/Linux|Android/i.test(ua) || /Linux/i.test(plat))         return 'linux';
+  return null;
 }
 
-// ── Release links — update these when desktop builds are published ──────────
-const RELEASES = {
-  windows: {
-    label:     'Windows',
-    ext:       '.exe',
-    url:       'https://github.com/eduzere/nexus/releases/latest/download/Nexus-Setup.exe',
-    secondary: 'https://github.com/eduzere/nexus/releases',
-    note:      'Windows 10 / 11 — 64-bit',
-  },
-  mac: {
-    label:     'macOS',
-    ext:       '.dmg',
-    url:       'https://github.com/eduzere/nexus/releases/latest/download/Nexus.dmg',
-    secondary: 'https://github.com/eduzere/nexus/releases',
-    note:      'macOS 12+ (Apple Silicon & Intel)',
-  },
-  linux: {
-    label:     'Linux',
-    ext:       '.AppImage',
-    url:       'https://github.com/eduzere/nexus/releases/latest/download/Nexus.AppImage',
-    secondary: 'https://github.com/eduzere/nexus/releases',
-    note:      'AppImage · works on any distro',
-  },
+// ── Fallback URLs (correct repo) ────────────────────────────────────────────
+const FALLBACK = {
+  windows: 'https://github.com/jissantoindia/nexus/releases/latest/download/Nexus-Setup-1.0.0.exe',
+  mac:     'https://github.com/jissantoindia/nexus/releases/latest/download/Nexus-1.0.0-arm64.dmg',
+  linux:   'https://github.com/jissantoindia/nexus/releases/latest/download/Nexus-1.0.0.AppImage',
 };
 
-// ── SVG platform icons ──────────────────────────────────────────────────────
+const PLATFORM_INFO = {
+  windows: { label: 'Windows', ext: '.exe',      note: 'Windows 10 / 11 — 64-bit' },
+  mac:     { label: 'macOS',   ext: '.dmg',      note: 'macOS 12+ (Apple Silicon & Intel)' },
+  linux:   { label: 'Linux',   ext: '.AppImage', note: 'AppImage · works on any distro' },
+};
+
+const PLATFORM_META = {
+  windows: { color: '#00a4ef', bg: 'rgba(0,164,239,0.1)' },
+  mac:     { color: '#a3aaae', bg: 'rgba(163,170,174,0.1)' },
+  linux:   { color: '#fcc624', bg: 'rgba(252,198,36,0.1)' },
+};
+
+// ── SVG Platform Icons ───────────────────────────────────────────────────────
 function WindowsIcon({ size = 20 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -55,21 +50,35 @@ function MacIcon({ size = 20 }) {
 function LinuxIcon({ size = 20 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12.504 0C6.002 0 5.898 6.66 5.898 6.66c.138 3.154 2.28 3.851 2.28 3.851.085.064.17.1.248.126-.017.063-.04.11-.051.188-.068.43.03 2.02.03 2.02.185.85.61 1.09 1.35 1.09.43 0 .79-.065 1.09-.195.32.265.705.39 1.155.39.56 0 1.005-.195 1.35-.59.34.41.7.59 1.095.59.595 0 1.035-.275 1.32-.82.2-.38.275-.83.275-1.35V9.84s2.085-.14 2.085-3.58c0 0-.105-6.26-6.621-6.26zM9.88 5.5c-.295.005-.555.095-.765.265-.315.24-.48.61-.48 1.055 0 .78.455 1.365 1.35 1.365.47 0 .845-.16 1.12-.47.295-.34.43-.8.43-1.37 0-.97-.435-1.45-1.655-.845zm4.31 0c-1.26-.605-1.655-.125-1.655.845 0 .57.135 1.03.43 1.37.275.31.65.47 1.12.47.895 0 1.35-.585 1.35-1.365 0-.445-.165-.815-.48-1.055-.21-.17-.47-.26-.765-.265zM7.51 12.35c-.2.01-.38.04-.565.07-.38.065-.725.185-1.04.36-.78.435-1.25 1.155-1.41 2.16-.035.195-.05.4-.05.6v.545c0 .315.025.615.075.91l.23 1.24.005.025c.11.6.165 1.21.165 1.82 0 .535-.01 1.015-.035 1.44-.065 1.215-.385 1.815-.385 1.815s-.44.475-.44.93c0 .405.345.69.73.69.455 0 .67-.26.83-.485.21-.31.405-.64.58-.98.2-.38.38-.745.53-1.11.195-.495.32-1.015.36-1.555.015-.21.025-.415.025-.625v-.57c0-.585-.025-1.165-.07-1.74-.055-.67-.165-1.33-.33-1.99-.085-.345-.09-.52-.03-.6.035-.05.12-.08.26-.08.375 0 .87.185.87.185l.44-.805s-.625-.295-1.32-.295c-.05 0-.095 0-.145.005zm9.255 0c-.695 0-1.32.295-1.32.295l.44.805s.495-.185.87-.185c.14 0 .225.03.26.08.06.08.055.255-.03.6-.165.66-.275 1.32-.33 1.99-.045.575-.07 1.155-.07 1.74v.57c0 .21.01.415.025.625.04.54.165 1.06.36 1.555.15.365.33.73.53 1.11.175.34.37.67.58.98.16.225.375.485.83.485.385 0 .73-.285.73-.69 0-.455-.44-.93-.44-.93s-.32-.6-.385-1.815c-.025-.425-.035-.905-.035-1.44 0-.61.055-1.22.165-1.82l.005-.025.23-1.24c.05-.295.075-.595.075-.91v-.545c0-.2-.015-.405-.05-.6-.16-1.005-.63-1.725-1.41-2.16-.315-.175-.66-.295-1.04-.36-.185-.03-.365-.06-.565-.07z"/>
+      <path d="M12.504 0C6.002 0 5.898 6.66 5.898 6.66c.138 3.154 2.28 3.851 2.28 3.851.085.064.17.1.248.126-.017.063-.04.11-.051.188-.068.43.03 2.02.03 2.02.185.85.61 1.09 1.35 1.09.43 0 .79-.065 1.09-.195.32.265.705.39 1.155.39.56 0 1.005-.195 1.35-.59.34.41.7.59 1.095.59.595 0 1.035-.275 1.32-.82.2-.38.275-.83.275-1.35V9.84s2.085-.14 2.085-3.58c0 0-.105-6.26-6.621-6.26z"/>
     </svg>
   );
 }
 
-const PLATFORM_META = {
-  windows: { Icon: WindowsIcon, color: '#00a4ef', bg: 'rgba(0,164,239,0.1)' },
-  mac:     { Icon: MacIcon,     color: '#a3aaae', bg: 'rgba(163,170,174,0.1)' },
-  linux:   { Icon: LinuxIcon,   color: '#fcc624', bg: 'rgba(252,198,36,0.1)' },
-};
+const ICONS = { windows: WindowsIcon, mac: MacIcon, linux: LinuxIcon };
 
+// ── Main Component ───────────────────────────────────────────────────────────
 export default function DownloadModal({ onClose }) {
-  const [os] = useState(detectOS);
+  const [os]      = useState(detectOS);
+  const [urls,    setUrls]    = useState(FALLBACK);
+  const [version, setVersion] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const others = Object.keys(RELEASES).filter(k => k !== os);
+  // Load URLs from Appwrite admin-set release config
+  useEffect(() => {
+    getAppRelease().then(doc => {
+      if (doc) {
+        setUrls({
+          windows: doc.win_url   || FALLBACK.windows,
+          mac:     doc.mac_url   || FALLBACK.mac,
+          linux:   doc.linux_url || FALLBACK.linux,
+        });
+        if (doc.version) setVersion(doc.version);
+      }
+    }).catch(() => { /* keep fallback */ }).finally(() => setLoading(false));
+  }, []);
+
+  const others = Object.keys(PLATFORM_INFO).filter(k => k !== os);
 
   return (
     <div className="overlay" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -77,7 +86,7 @@ export default function DownloadModal({ onClose }) {
         <div className="modal-header">
           <div className="download-modal-title">
             <Download size={16} className="download-icon" />
-            <h3>Download Nexus Desktop</h3>
+            <h3>Download Nexus Desktop{version ? ` v${version}` : ''}</h3>
           </div>
           <button className="btn btn-icon btn-ghost" onClick={onClose}><X size={16} /></button>
         </div>
@@ -86,34 +95,40 @@ export default function DownloadModal({ onClose }) {
           Use Nexus as a native desktop app — faster, offline-capable, and no browser tabs required.
         </p>
 
-        {/* Detected / recommended platform — highlighted */}
-        {os && (
-          <div className="download-primary-section">
-            <div className="download-section-label">Recommended for your system</div>
-            <PlatformCard platform={os} primary />
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
+            <Loader2 size={22} className="spin" style={{ color: 'var(--accent)' }} />
           </div>
+        ) : (
+          <>
+            {/* Recommended platform */}
+            {os && (
+              <div className="download-primary-section">
+                <div className="download-section-label">Recommended for your system</div>
+                <PlatformCard platform={os} url={urls[os]} primary />
+              </div>
+            )}
+
+            {/* All other platforms */}
+            <div className="download-other-section">
+              {os && <div className="download-section-label" style={{ marginBottom: 8 }}>Other platforms</div>}
+              <div className="download-other-list">
+                {(os ? others : Object.keys(PLATFORM_INFO)).map(p => (
+                  <PlatformCard key={p} platform={p} url={urls[p]} />
+                ))}
+              </div>
+            </div>
+          </>
         )}
-
-        {/* All other platforms — always visible */}
-        <div className="download-other-section">
-          {os && <div className="download-section-label" style={{ marginBottom: 8 }}>Other platforms</div>}
-          <div className="download-other-list">
-            {/* If OS unknown, show all; otherwise show the remaining two */}
-            {(os ? others : Object.keys(RELEASES)).map(p => (
-              <PlatformCard key={p} platform={p} />
-            ))}
-          </div>
-        </div>
-
       </div>
     </div>
   );
 }
 
-function PlatformCard({ platform, primary }) {
-  const info = RELEASES[platform];
+function PlatformCard({ platform, url, primary }) {
+  const info = PLATFORM_INFO[platform];
   const meta = PLATFORM_META[platform];
-  const { Icon } = meta;
+  const Icon = ICONS[platform];
 
   return (
     <div className={`download-card ${primary ? 'download-card-primary' : ''}`}>
@@ -130,7 +145,7 @@ function PlatformCard({ platform, primary }) {
         </div>
       </div>
       <a
-        href={info.url}
+        href={url}
         className={`btn ${primary ? 'btn-primary' : 'btn-secondary'} download-btn`}
         target="_blank"
         rel="noopener noreferrer">

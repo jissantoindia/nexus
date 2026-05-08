@@ -51,7 +51,12 @@
     "mac": {
       "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
       "icon": "electron/icons/flash.icns",
-      "category": "public.app-category.developer-tools"
+      "category": "public.app-category.developer-tools",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "electron/entitlements.mac.plist",
+      "entitlementsInherit": "electron/entitlements.mac.plist",
+      "notarize": true
     },
     "linux": {
       "target": [{ "target": "AppImage", "arch": ["x64"] }],

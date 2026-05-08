@@ -7,7 +7,7 @@ on:
       - 'v*.*.*'
 
 jobs:
-  # ── macOS build (DMG for Intel + Apple Silicon) ────────────────────────────
+  # ── macOS build — signed + notarized (no Gatekeeper warning) ──────────────
   build-mac:
     name: macOS
     runs-on: macos-latest
@@ -22,13 +22,31 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Import Developer ID Application certificate from GitHub secret
+      - name: Import signing certificate
+        env:
+          CERTIFICATE_P12:        ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          CERTIFICATE_PASSWORD:   ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/build.keychain
+          CERT_PATH=$RUNNER_TEMP/cert.p12
+
+          echo "$CERTIFICATE_P12" | base64 --decode > "$CERT_PATH"
+
+          security create-keychain -p "build_keychain_pw" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "build_keychain_pw" "$KEYCHAIN_PATH"
+          security import "$CERT_PATH" -k "$KEYCHAIN_PATH" -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: -s -k "build_keychain_pw" "$KEYCHAIN_PATH"
+
       - name: Build web (Vite)
         run: npm run build
         env:
           ELECTRON_BUILD: true
-          VITE_APPWRITE_ENDPOINT:            ${{ secrets.VITE_APPWRITE_ENDPOINT }}
-          VITE_APPWRITE_PROJECT_ID:          ${{ secrets.VITE_APPWRITE_PROJECT_ID }}
-          VITE_APPWRITE_DATABASE_ID:         ${{ secrets.VITE_APPWRITE_DATABASE_ID }}
+          VITE_APPWRITE_ENDPOINT:               ${{ secrets.VITE_APPWRITE_ENDPOINT }}
+          VITE_APPWRITE_PROJECT_ID:             ${{ secrets.VITE_APPWRITE_PROJECT_ID }}
+          VITE_APPWRITE_DATABASE_ID:            ${{ secrets.VITE_APPWRITE_DATABASE_ID }}
           VITE_APPWRITE_PROJECTS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_PROJECTS_COLLECTION_ID }}
           VITE_APPWRITE_REQUESTS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_REQUESTS_COLLECTION_ID }}
           VITE_APPWRITE_DOCS_COLLECTION_ID:     ${{ secrets.VITE_APPWRITE_DOCS_COLLECTION_ID }}
@@ -37,12 +55,20 @@ jobs:
           VITE_APPWRITE_SETTINGS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_SETTINGS_COLLECTION_ID }}
           VITE_APPWRITE_FEEDBACK_BUCKET_ID:     ${{ secrets.VITE_APPWRITE_FEEDBACK_BUCKET_ID }}
           VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID: ${{ secrets.VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID }}
-          VITE_GEMINI_API_KEY:               ${{ secrets.VITE_GEMINI_API_KEY }}
+          VITE_GEMINI_API_KEY:                  ${{ secrets.VITE_GEMINI_API_KEY }}
 
-      - name: Package macOS app
+      # Sign, notarize, and staple in one step via electron-builder
+      - name: Package, sign & notarize macOS app
         run: npx electron-builder --mac --publish always
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN:               ${{ secrets.GH_TOKEN }}
+          # Signing
+          CSC_LINK:               ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          CSC_KEY_PASSWORD:       ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          # Notarization (Apple ID + app-specific password + Team ID)
+          APPLE_ID:               ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID:          ${{ secrets.APPLE_TEAM_ID }}
 
   # ── Windows build (NSIS installer) ────────────────────────────────────────
   build-win:
