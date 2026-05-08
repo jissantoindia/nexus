@@ -6,7 +6,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useApp } from '../context/AppContext';
 import { useDialog } from '../components/Dialog/Dialog';
-import { getProjects, getRequests } from '../appwrite/database';
+import { getProjects, getSharedProjects, getRequests, getProjectDocsCloud, saveProjectDocsCloud } from '../appwrite/database';
 import { generateWithOpenAI } from '../ai/openai';
 import {
   ArrowLeft, Sparkles, BookOpen, RefreshCw, Lock, Unlock,
@@ -15,13 +15,14 @@ import {
 } from 'lucide-react';
 import './ProjectDocs.css';
 
-const DOC_STORE_KEY = (projectId) => `nexus_project_doc_${projectId}`;
+const DOC_CACHE_KEY = (projectId) => `nexus_project_doc_${projectId}`;
 
-function loadProjectDoc(projectId) {
-  try { return JSON.parse(localStorage.getItem(DOC_STORE_KEY(projectId)) || 'null'); } catch { return null; }
+// Local cache helpers (fast access, cloud is source of truth)
+function cacheLoad(projectId) {
+  try { return JSON.parse(localStorage.getItem(DOC_CACHE_KEY(projectId)) || 'null'); } catch { return null; }
 }
-function saveProjectDoc(projectId, data) {
-  localStorage.setItem(DOC_STORE_KEY(projectId), JSON.stringify(data));
+function cacheSave(projectId, data) {
+  try { localStorage.setItem(DOC_CACHE_KEY(projectId), JSON.stringify(data)); } catch {}
 }
 
 // Build folder→requests structure from flat requests list
@@ -60,21 +61,30 @@ export default function ProjectDocs() {
   const scrollRef = useRef(null);
   const userId    = state.user?.$id;
 
-  // ── Load project & requests ──────────────────────────────────────────────────
+  // ── Load project & requests (owned + shared) ──────────────────────────────
   useEffect(() => {
     if (!state.activeProjectId || !userId) { setLoading(false); return; }
+    const pid   = state.activeProjectId;
+    const email = state.user?.email;
     setLoading(true);
+
     Promise.all([
-      getProjects(userId),
-      getRequests(state.activeProjectId),
-    ]).then(([projs, reqs]) => {
-      setProject(projs.find(p => p.$id === state.activeProjectId) || null);
+      // Resolve project from owned OR shared projects
+      getProjects(userId)
+        .then(projs => projs.find(p => p.$id === pid) || null)
+        .then(found => found
+          ? found
+          : getSharedProjects(email).then(shared => shared.find(p => p.$id === pid) || null)
+        ),
+      getRequests(pid),
+      // Cloud-first: check Appwrite, fall back to local cache
+      getProjectDocsCloud(pid).then(cloud => cloud ?? cacheLoad(pid)),
+    ]).then(([proj, reqs, stored]) => {
+      setProject(proj);
       setRequests(reqs);
-      const stored = loadProjectDoc(state.activeProjectId);
       if (stored) {
         setDocData(stored);
         setPassword(stored.password || '');
-        // Open all folders by default
         const fnames = Object.keys(buildFolderMap(reqs).folders);
         const opened = {};
         fnames.forEach(f => { opened[f] = true; });
@@ -126,7 +136,11 @@ export default function ProjectDocs() {
       projectId: state.activeProjectId,
       projectName: project?.name || '',
     };
-    saveProjectDoc(state.activeProjectId, newDoc);
+    // Save to cloud (so collaborators see it) + local cache (fast reload)
+    await saveProjectDocsCloud(state.activeProjectId, newDoc).catch(e =>
+      console.warn('[ProjectDocs] Cloud save failed, cached only:', e.message)
+    );
+    cacheSave(state.activeProjectId, newDoc);
     setDocData(newDoc);
     setGenerating(false);
     setGenProgress(null);
@@ -162,25 +176,29 @@ export default function ProjectDocs() {
     setCopied(true); setTimeout(() => setCopied(false), 2000);
   }
 
-  // ── Save password/visibility ─────────────────────────────────────────────────
+  // ── Save password/visibility ──────────────────────────────────────────────
   function applyPassword(pw) {
     if (!docData) return;
     const updated = { ...docData, password: pw };
-    saveProjectDoc(state.activeProjectId, updated);
+    saveProjectDocsCloud(state.activeProjectId, updated).catch(e =>
+      console.warn('[ProjectDocs] Cloud save failed:', e.message)
+    );
+    cacheSave(state.activeProjectId, updated);
     setDocData(updated);
     setShowPassPanel(false);
     toast(pw ? '🔒 Documentation protected.' : '🌐 Documentation set to public.', 'success');
   }
 
-  // ── Update section content (inline edit) ─────────────────────────────────────
+  // ── Update section content (inline edit) ───────────────────────────────────
   function updateSectionContent(folderIdx, reqIdx, content) {
     const updated = { ...docData };
     updated.sections = [...docData.sections];
     updated.sections[folderIdx] = { ...updated.sections[folderIdx] };
     updated.sections[folderIdx].requests = [...updated.sections[folderIdx].requests];
     updated.sections[folderIdx].requests[reqIdx] = { ...updated.sections[folderIdx].requests[reqIdx], content };
-    saveProjectDoc(state.activeProjectId, updated);
+    cacheSave(state.activeProjectId, updated);
     setDocData(updated);
+    // debounce cloud save on edit — save happens on regenerate or explicit save
   }
 
   // ── Scroll to section ────────────────────────────────────────────────────────

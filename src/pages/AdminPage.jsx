@@ -25,7 +25,8 @@ export default function AdminPage() {
   const [creating, setCreating] = useState(false);
 
   // ── Release management state ──────────────────────────────────────────────
-  const [release, setRelease]         = useState({ version: '', win_url: '', mac_url: '', linux_url: '', release_notes: '' });
+  const [showRelease, setShowRelease]       = useState(false);
+  const [release, setRelease]               = useState({ version: '', win_url: '', mac_url: '', linux_url: '', release_notes: '' });
   const [releaseLoading, setReleaseLoading] = useState(true);
   const [releaseSaving, setReleaseSaving]   = useState(false);
 
@@ -44,7 +45,6 @@ export default function AdminPage() {
 
   useEffect(() => {
     loadUsers();
-    // Load release info regardless of admin key
     getAppRelease().then(doc => {
       if (doc) setRelease({
         version:       doc.version       || '',
@@ -63,7 +63,8 @@ export default function AdminPage() {
     setReleaseSaving(true);
     try {
       await saveAppRelease(release);
-      toast('Release info saved! Users will see the update prompt.', 'success');
+      toast('Release published! Users will see the update prompt.', 'success');
+      setShowRelease(false);
     } catch (err) {
       toast('Failed to save: ' + err.message, 'error');
     } finally {
@@ -112,6 +113,13 @@ export default function AdminPage() {
         <Link to="/" className="btn btn-ghost btn-sm"><ArrowLeft size={13} /> Workspace</Link>
         <div className="admin-title"><Shield size={16} /><h1>Admin Panel</h1></div>
         <div className="admin-actions">
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => setShowRelease(true)}
+            title="Manage app releases"
+          >
+            <Package size={13} /> Release Manager
+          </button>
           {!keyMissing && (
             <>
               <button className="btn btn-ghost btn-sm" onClick={loadUsers} disabled={loading}><RefreshCw size={13} /></button>
@@ -208,108 +216,122 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ── App Release Management ── */}
-      <div className="admin-release-section">
-        <div className="admin-section-title">
-          <Package size={16} />
-          <h2>App Release Management</h2>
-          <span className="admin-section-subtitle">
-            When you publish a new version, update these fields. All running instances will show an update prompt automatically.
-          </span>
-        </div>
-
-        {releaseLoading ? (
-          <div className="admin-loading"><Loader2 size={20} className="spin" /></div>
-        ) : (
-          <form className="admin-release-form" onSubmit={handleSaveRelease}>
-            <div className="admin-release-grid">
-              {/* Version */}
-              <div className="admin-release-field full-width">
-                <label className="admin-field-label">Current Release Version <span className="required">*</span></label>
-                <input
-                  className="input admin-release-input"
-                  placeholder="e.g.  1.2.0"
-                  value={release.version}
-                  onChange={e => setRelease(r => ({ ...r, version: e.target.value }))}
-                  required
-                />
-                <span className="admin-field-hint">Users on older versions will see an update banner.</span>
-              </div>
-
-              {/* Windows URL */}
-              <div className="admin-release-field">
-                <label className="admin-field-label">
-                  <svg width={13} height={13} viewBox="0 0 24 24" fill="currentColor" style={{color:'#00a4ef'}}><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
-                  Windows Download URL (.exe)
-                </label>
-                <input
-                  className="input admin-release-input"
-                  type="url"
-                  placeholder="https://…/Nexus-Setup.exe"
-                  value={release.win_url}
-                  onChange={e => setRelease(r => ({ ...r, win_url: e.target.value }))}
-                />
-              </div>
-
-              {/* macOS URL */}
-              <div className="admin-release-field">
-                <label className="admin-field-label">
-                  <svg width={13} height={13} viewBox="0 0 24 24" fill="currentColor" style={{color:'#a3aaae'}}><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>
-                  macOS Download URL (.dmg)
-                </label>
-                <input
-                  className="input admin-release-input"
-                  type="url"
-                  placeholder="https://…/Nexus.dmg"
-                  value={release.mac_url}
-                  onChange={e => setRelease(r => ({ ...r, mac_url: e.target.value }))}
-                />
-              </div>
-
-              {/* Linux URL */}
-              <div className="admin-release-field">
-                <label className="admin-field-label">
-                  <svg width={13} height={13} viewBox="0 0 24 24" fill="currentColor" style={{color:'#fcc624'}}><path d="M12.504 0C6.002 0 5.898 6.66 5.898 6.66c.138 3.154 2.28 3.851 2.28 3.851.085.064.17.1.248.126-.017.063-.04.11-.051.188-.068.43.03 2.02.03 2.02.185.85.61 1.09 1.35 1.09.43 0 .79-.065 1.09-.195.32.265.705.39 1.155.39.56 0 1.005-.195 1.35-.59.34.41.7.59 1.095.59.595 0 1.035-.275 1.32-.82.2-.38.275-.83.275-1.35V9.84s2.085-.14 2.085-3.58c0 0-.105-6.26-6.621-6.26z"/></svg>
-                  Linux Download URL (.AppImage)
-                </label>
-                <input
-                  className="input admin-release-input"
-                  type="url"
-                  placeholder="https://…/Nexus.AppImage"
-                  value={release.linux_url}
-                  onChange={e => setRelease(r => ({ ...r, linux_url: e.target.value }))}
-                />
-              </div>
-
-              {/* Release notes */}
-              <div className="admin-release-field full-width">
-                <label className="admin-field-label">Release Notes <span className="admin-field-optional">(optional — shown in the update banner)</span></label>
-                <textarea
-                  className="input admin-release-input admin-release-notes"
-                  placeholder="What's new in this version? Bug fixes, new features…"
-                  value={release.release_notes}
-                  onChange={e => setRelease(r => ({ ...r, release_notes: e.target.value }))}
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            <div className="admin-release-actions">
-              <button className="btn btn-primary" type="submit" disabled={releaseSaving}>
-                {releaseSaving ? <Loader2 size={14} className="spin" /> : <Save size={14} />}
-                {releaseSaving ? 'Saving…' : 'Publish Release'}
-              </button>
-              <span className="admin-field-hint">
-                After saving, all web and desktop app users will see an update notification within seconds.
-              </span>
-            </div>
-          </form>
-        )}
-      </div>
-
       <div className="admin-footer">
         <p>User management uses your Appwrite server API key stored in <code>VITE_APPWRITE_ADMIN_KEY</code>.</p>
       </div>
+
+      {/* ── Release Manager Popup ── */}
+      {showRelease && (
+        <div className="release-modal-backdrop" onClick={e => { if (e.target === e.currentTarget) setShowRelease(false); }}>
+          <div className="release-modal">
+            {/* Header */}
+            <div className="release-modal-header">
+              <div className="release-modal-title">
+                <div className="release-modal-icon"><Package size={18} /></div>
+                <div>
+                  <h2>App Release Manager</h2>
+                  <p>Publish a new version — all running instances will show an update prompt.</p>
+                </div>
+              </div>
+              <button className="btn btn-ghost btn-icon release-modal-close" onClick={() => setShowRelease(false)}>
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="release-modal-body">
+              {releaseLoading ? (
+                <div className="admin-loading"><Loader2 size={24} className="spin" /><p>Loading…</p></div>
+              ) : (
+                <form id="release-form" onSubmit={handleSaveRelease}>
+                  {/* Version */}
+                  <div className="rm-field">
+                    <label className="rm-label">
+                      Version Number <span className="rm-required">*</span>
+                    </label>
+                    <input
+                      className="input"
+                      placeholder="e.g.  1.4.0"
+                      value={release.version}
+                      onChange={e => setRelease(r => ({ ...r, version: e.target.value }))}
+                      required
+                    />
+                    <span className="rm-hint">Users on older versions will see an update banner.</span>
+                  </div>
+
+                  {/* Download URLs */}
+                  <div className="rm-url-grid">
+                    <div className="rm-field">
+                      <label className="rm-label">
+                        <svg width={13} height={13} viewBox="0 0 24 24" fill="currentColor" style={{color:'#00a4ef'}}>
+                          <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+                        </svg>
+                        Windows (.exe)
+                      </label>
+                      <input className="input" type="url" placeholder="https://…/Nexus-Setup.exe"
+                        value={release.win_url}
+                        onChange={e => setRelease(r => ({ ...r, win_url: e.target.value }))} />
+                    </div>
+
+                    <div className="rm-field">
+                      <label className="rm-label">
+                        <svg width={13} height={13} viewBox="0 0 24 24" fill="currentColor" style={{color:'#a3aaae'}}>
+                          <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
+                        </svg>
+                        macOS (.dmg)
+                      </label>
+                      <input className="input" type="url" placeholder="https://…/Nexus.dmg"
+                        value={release.mac_url}
+                        onChange={e => setRelease(r => ({ ...r, mac_url: e.target.value }))} />
+                    </div>
+
+                    <div className="rm-field">
+                      <label className="rm-label">
+                        <svg width={13} height={13} viewBox="0 0 24 24" fill="currentColor" style={{color:'#fcc624'}}>
+                          <path d="M12.504 0C6.002 0 5.898 6.66 5.898 6.66c.138 3.154 2.28 3.851 2.28 3.851.085.064.17.1.248.126-.017.063-.04.11-.051.188-.068.43.03 2.02.03 2.02.185.85.61 1.09 1.35 1.09.43 0 .79-.065 1.09-.195.32.265.705.39 1.155.39.56 0 1.005-.195 1.35-.59.34.41.7.59 1.095.59.595 0 1.035-.275 1.32-.82.2-.38.275-.83.275-1.35V9.84s2.085-.14 2.085-3.58c0 0-.105-6.26-6.621-6.26z"/>
+                        </svg>
+                        Linux (.AppImage)
+                      </label>
+                      <input className="input" type="url" placeholder="https://…/Nexus.AppImage"
+                        value={release.linux_url}
+                        onChange={e => setRelease(r => ({ ...r, linux_url: e.target.value }))} />
+                    </div>
+                  </div>
+
+                  {/* Release notes */}
+                  <div className="rm-field">
+                    <label className="rm-label">
+                      Release Notes
+                      <span className="rm-optional">(shown in the update banner)</span>
+                    </label>
+                    <textarea
+                      className="input rm-notes"
+                      placeholder="What's new in this version? Bug fixes, new features…"
+                      value={release.release_notes}
+                      onChange={e => setRelease(r => ({ ...r, release_notes: e.target.value }))}
+                      rows={4}
+                    />
+                  </div>
+                </form>
+              )}
+            </div>
+
+            {/* Footer */}
+            {!releaseLoading && (
+              <div className="release-modal-footer">
+                <span className="rm-hint">After saving, all app users will see the update notification.</span>
+                <div className="release-modal-btns">
+                  <button className="btn btn-ghost" onClick={() => setShowRelease(false)}>Cancel</button>
+                  <button className="btn btn-primary" type="submit" form="release-form" disabled={releaseSaving}>
+                    {releaseSaving ? <Loader2 size={14} className="spin" /> : <Save size={14} />}
+                    {releaseSaving ? 'Publishing…' : 'Publish Release'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
