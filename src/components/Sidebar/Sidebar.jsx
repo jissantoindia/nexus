@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import nexusLogo from '/flash.png';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { useDialog } from '../Dialog/Dialog';
@@ -433,7 +434,7 @@ export default function Sidebar({ onOpenSettings }) {
     <aside className="sidebar">
       {/* Logo row — settings button sits at the far right */}
       <div className="sidebar-logo">
-        <img src="/flash.png" className="logo-img" alt="Nexus" />
+        <img src={nexusLogo} className="logo-img" alt="Nexus" />
         <div className="logo-text-group">
           <span className="logo-text">Nexus</span>
           <span className="logo-version-badge">v{CURRENT_VERSION}</span>

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import nexusLogo from '/flash.png';
+
 import { useApp } from '../../context/AppContext';
 import { changePassword } from '../../appwrite/database';
 import { useDialog } from '../Dialog/Dialog';
@@ -189,7 +191,7 @@ export default function SettingsModal({ onClose }) {
             {activeTab === 'about' && (
               <div className="settings-content">
                 <div className="settings-about-hero">
-                  <img src="/flash.png" className="settings-about-logo" alt="Nexus" />
+                  <img src={nexusLogo} className="settings-about-logo" alt="Nexus" />
                   <div className="settings-about-name">Nexus</div>
                   <div className="settings-about-tagline">API Testing &amp; Documentation Platform</div>
                   <div className="settings-about-version">Version {CURRENT_VERSION}</div>

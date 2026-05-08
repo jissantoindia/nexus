@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import nexusLogo from '/flash.png';
 import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -111,7 +112,7 @@ export default function SharedProjectDoc() {
   if (error) return (
     <div className="shared-doc-page">
       <div className="sd-error">
-        <img src="/flash.png" style={{ width: 36, height: 36, marginBottom: 12, borderRadius: 8 }} alt="Nexus" />
+        <img src={nexusLogo} style={{ width: 36, height: 36, marginBottom: 12, borderRadius: 8 }} alt="Nexus" />
         <p>{error}</p>
         <Link to="/" className="btn btn-ghost"><ArrowLeft size={14}/> Open Nexus</Link>
       </div>
@@ -143,7 +144,7 @@ export default function SharedProjectDoc() {
       {/* Header */}
       <header className="sd-header">
         <div className="sd-header-inner">
-          <div className="sd-logo"><img src="/flash.png" className="sd-logo-img" alt="Nexus" /> Nexus</div>
+          <div className="sd-logo"><img src={nexusLogo} className="sd-logo-img" alt="Nexus" /> Nexus</div>
           <div className="spd-project-title">
             <h1>{doc.projectName || 'API Documentation'}</h1>
             {!doc.password
@@ -276,7 +277,7 @@ export default function SharedProjectDoc() {
             ))}
 
             <div className="spd-footer">
-              <div className="sd-logo" style={{ opacity: 0.5 }}><img src="/flash.png" className="sd-logo-img" alt="Nexus" /> Powered by Nexus</div>
+              <div className="sd-logo" style={{ opacity: 0.5 }}><img src={nexusLogo} className="sd-logo-img" alt="Nexus" /> Powered by Nexus</div>
               <span>{new Date(doc.generatedAt).toLocaleString()}</span>
             </div>
           </div>

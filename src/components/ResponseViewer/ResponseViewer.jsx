@@ -58,9 +58,9 @@ export default function ResponseViewer({ response, lastRequest, onDocGenerated }
     if (!lastRequest) { toast('No request context available.', 'warning'); return; }
     if (!state.activeProjectId) { toast('Select a project first.', 'warning'); return; }
 
-    const openaiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    const openaiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (!openaiKey) {
-      toast('VITE_OPENAI_API_KEY is not set in your .env file.', 'error', 6000); return;
+      toast('VITE_GEMINI_API_KEY is not set in your .env file.', 'error', 6000); return;
     }
 
     setGenLoading(true);

@@ -24,10 +24,11 @@ function isNewer(remote, current) {
  * In web: userAgent only.
  */
 function detectPlatform() {
-  const ua = navigator.userAgent.toLowerCase();
-  if (ua.includes('win'))   return 'windows';
-  if (ua.includes('mac'))   return 'mac';
-  if (ua.includes('linux')) return 'linux';
+  const ua = navigator.userAgent;
+  // Order matters: check Mac before Win (some UAs contain both strings)
+  if (/Mac|iPhone|iPad|iPod/i.test(ua))  return 'mac';
+  if (/Win/i.test(ua))                   return 'windows';
+  if (/Linux|Android/i.test(ua))         return 'linux';
   return null;
 }
 

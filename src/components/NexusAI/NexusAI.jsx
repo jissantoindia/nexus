@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
-import { getProjects, getRequests } from '../../appwrite/database';
+import { getProjects, getSharedProjects, getRequests } from '../../appwrite/database';
 import { Send, ChevronRight, X, RefreshCw, User, Loader2, ChevronDown, SlidersHorizontal, FolderOpen, Globe } from 'lucide-react';
+import aiLogo from '/ai.png';
+import nexusLogo from '/flash.png';
 import './NexusAI.css';
 
-const OPENAI_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 const WELCOME = `Hey! I'm **Nexus AI** ✦
 
@@ -35,10 +37,23 @@ export default function NexusAI() {
 
   const userId = state.user?.$id;
 
-  // ── Load projects ──────────────────────────────────────────────────────────
+  // ── Load projects (owned + shared) ─────────────────────────────────────────
   useEffect(() => {
     if (!userId) return;
-    getProjects(userId).then(setProjects).catch(() => {});
+    const email = state.user?.email;
+    Promise.all([
+      getProjects(userId).catch(() => []),
+      getSharedProjects(email).catch(() => []),
+    ]).then(([owned, shared]) => {
+      // Merge, dedup by $id
+      const seen = new Set();
+      const all = [...owned, ...shared].filter(p => {
+        if (seen.has(p.$id)) return false;
+        seen.add(p.$id);
+        return true;
+      });
+      setProjects(all);
+    });
   }, [userId]);
 
   // Auto-select active project
@@ -112,10 +127,10 @@ Reference these endpoints when answering. Use the actual URLs and methods in cod
     const text = input.trim();
     if (!text || streaming) return;
 
-    if (!OPENAI_KEY) {
+    if (!GEMINI_KEY) {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: '⚠️ **AI key not set.** Add `VITE_OPENAI_API_KEY` to your `.env` file and restart the dev server.',
+        content: '⚠️ **AI key not set.** Add `VITE_GEMINI_API_KEY` to your `.env` file.',
         error: true,
       }]);
       return;
@@ -131,21 +146,29 @@ Reference these endpoints when answering. Use the actual URLs and methods in cod
 
     try {
       abortRef.current = new AbortController();
-      const resp = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        signal: abortRef.current.signal,
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_KEY}` },
-        body: JSON.stringify({
-          model: 'gpt-4o',
-          stream: true,
-          temperature: 0.35,
-          messages: [
-            { role: 'system', content: buildSystemPrompt() },
-            ...history,
-            userMsg,
-          ],
-        }),
-      });
+      // Build Gemini contents array (system prompt prepended as first user turn)
+      const geminiContents = [
+        { role: 'user', parts: [{ text: buildSystemPrompt() }] },
+        { role: 'model', parts: [{ text: 'Understood. I am Nexus AI, ready to help with your API.' }] },
+        ...history.slice(1).map(m => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: m.content }],
+        })),
+        { role: 'user', parts: [{ text: text }] },
+      ];
+
+      const resp = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${GEMINI_KEY}`,
+        {
+          method: 'POST',
+          signal: abortRef.current.signal,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: geminiContents,
+            generationConfig: { temperature: 0.35, maxOutputTokens: 4096 },
+          }),
+        }
+      );
 
       if (!resp.ok) {
         const err = await resp.json();
@@ -155,17 +178,23 @@ Reference these endpoints when answering. Use the actual URLs and methods in cod
       const reader  = resp.body.getReader();
       const decoder = new TextDecoder();
       let fullContent = '';
+      let buffer = '';
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        const lines = decoder.decode(value).split('\n').filter(l => l.startsWith('data: '));
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop(); // keep incomplete last line
         for (const line of lines) {
-          const data = line.slice(6);
-          if (data === '[DONE]') break;
+          if (!line.startsWith('data: ')) continue;
+          const data = line.slice(6).trim();
+          if (!data || data === '[DONE]') continue;
           try {
-            const delta = JSON.parse(data).choices?.[0]?.delta?.content || '';
-            fullContent += delta;
+            // Gemini SSE format: candidates[0].content.parts[0].text
+            const chunk = JSON.parse(data);
+            const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            fullContent += text;
             setMessages(prev => {
               const copy = [...prev];
               copy[copy.length - 1] = { role: 'assistant', content: fullContent, streaming: true };
@@ -229,7 +258,7 @@ Reference these endpoints when answering. Use the actual URLs and methods in cod
       <button className="nexus-ai-toggle" onClick={() => setOpen(!open)} title={open ? 'Hide Nexus AI' : 'Open Nexus AI'}>
         <div className="nexus-ai-toggle-inner">
           {open ? <ChevronRight size={14} /> : (
-            <><img src="/ai.png" className="nexus-ai-icon-img" alt="AI" /><span>Nexus AI</span></>
+            <><img src={aiLogo} className="nexus-ai-icon-img" alt="AI" /><span>Nexus AI</span></>
           )}
         </div>
       </button>
@@ -239,7 +268,7 @@ Reference these endpoints when answering. Use the actual URLs and methods in cod
           {/* Header */}
           <div className="nexus-ai-header">
             <div className="nexus-ai-brand">
-              <img src="/ai.png" className="nexus-ai-logo-img" alt="Nexus AI" />
+              <img src={aiLogo} className="nexus-ai-logo-img" alt="Nexus AI" />
               <span>Nexus AI</span>
               <span className="nexus-ai-status-dot" />
             </div>
@@ -374,7 +403,7 @@ function Message({ msg }) {
   return (
     <div className={`nexus-ai-msg ${isUser ? 'user' : 'assistant'} ${msg.error ? 'error' : ''}`}>
       <div className="nexus-ai-msg-avatar">
-        {isUser ? <User size={13} /> : <img src="/ai.png" style={{ width: 13, height: 13, borderRadius: 3, objectFit: 'cover' }} alt="AI" />}
+        {isUser ? <User size={13} /> : <img src={aiLogo} style={{ width: 13, height: 13, borderRadius: 3, objectFit: 'cover' }} alt="AI" />}
       </div>
       <div className="nexus-ai-msg-content">
         <ReactMarkdownMsg content={msg.content} streaming={msg.streaming} />

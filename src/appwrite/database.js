@@ -315,11 +315,19 @@ export async function getAppRelease() {
 }
 
 export async function saveAppRelease(data) {
-  // Try update first, create if not exists
+  // Only send allowed fields — strip Appwrite system fields ($id, $collectionId, etc.)
+  const payload = {
+    version:       (data.version       || '').trim(),
+    win_url:       (data.win_url       || '').trim(),
+    mac_url:       (data.mac_url       || '').trim(),
+    linux_url:     (data.linux_url     || '').trim(),
+    release_notes: (data.release_notes || '').trim(),
+  };
+  // Try update first (document already exists), create if not
   try {
     await databases.getDocument(DB_ID, SETTINGS_COL, APP_RELEASE_DOC);
-    return databases.updateDocument(DB_ID, SETTINGS_COL, APP_RELEASE_DOC, data);
+    return databases.updateDocument(DB_ID, SETTINGS_COL, APP_RELEASE_DOC, payload);
   } catch {
-    return databases.createDocument(DB_ID, SETTINGS_COL, APP_RELEASE_DOC, data);
+    return databases.createDocument(DB_ID, SETTINGS_COL, APP_RELEASE_DOC, payload);
   }
 }

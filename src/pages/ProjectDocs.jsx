@@ -87,8 +87,8 @@ export default function ProjectDocs() {
   // ── Generate full project documentation ─────────────────────────────────────
   async function generateDocs() {
     if (!requests.length) { toast('No requests in this project.', 'warning'); return; }
-    const openaiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    if (!openaiKey) { toast('VITE_OPENAI_API_KEY not set in .env', 'error', 8000); return; }
+    const openaiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!openaiKey) { toast('VITE_GEMINI_API_KEY not set in .env', 'error', 8000); return; }
 
     setGenerating(true);
     setGenProgress({ done: 0, total: requests.length, current: '' });
