@@ -61,7 +61,7 @@ jobs:
           VITE_APPWRITE_SETTINGS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_SETTINGS_COLLECTION_ID }}
           VITE_APPWRITE_FEEDBACK_BUCKET_ID:     ${{ secrets.VITE_APPWRITE_FEEDBACK_BUCKET_ID }}
           VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID: ${{ secrets.VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID }}
-          VITE_GEMINI_API_KEY:                  ${{ secrets.VITE_GEMINI_API_KEY }}
+          VITE_OPENAI_API_KEY:               ${{ secrets.VITE_OPENAI_API_KEY }}
 
       # Sign + notarize if cert is configured, otherwise build unsigned DMG
       - name: Package macOS app (signed if cert available)
@@ -113,7 +113,7 @@ jobs:
           VITE_APPWRITE_SETTINGS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_SETTINGS_COLLECTION_ID }}
           VITE_APPWRITE_FEEDBACK_BUCKET_ID:     ${{ secrets.VITE_APPWRITE_FEEDBACK_BUCKET_ID }}
           VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID: ${{ secrets.VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID }}
-          VITE_GEMINI_API_KEY:               ${{ secrets.VITE_GEMINI_API_KEY }}
+          VITE_OPENAI_API_KEY:               ${{ secrets.VITE_OPENAI_API_KEY }}
 
       - name: Package Windows app
         run: npx electron-builder --win --publish always
@@ -158,7 +158,7 @@ jobs:
           VITE_APPWRITE_SETTINGS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_SETTINGS_COLLECTION_ID }}
           VITE_APPWRITE_FEEDBACK_BUCKET_ID:     ${{ secrets.VITE_APPWRITE_FEEDBACK_BUCKET_ID }}
           VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID: ${{ secrets.VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID }}
-          VITE_GEMINI_API_KEY:               ${{ secrets.VITE_GEMINI_API_KEY }}
+          VITE_OPENAI_API_KEY:               ${{ secrets.VITE_OPENAI_API_KEY }}
 
       - name: Package Linux app
         run: npx electron-builder --linux --publish always
@@ -194,7 +194,7 @@ jobs:
           VITE_APPWRITE_SETTINGS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_SETTINGS_COLLECTION_ID }}
           VITE_APPWRITE_FEEDBACK_BUCKET_ID:     ${{ secrets.VITE_APPWRITE_FEEDBACK_BUCKET_ID }}
           VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID: ${{ secrets.VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID }}
-          VITE_GEMINI_API_KEY:               ${{ secrets.VITE_GEMINI_API_KEY }}
+          VITE_OPENAI_API_KEY:               ${{ secrets.VITE_OPENAI_API_KEY }}
 
       # ── Option A: Deploy via rsync/SSH to your VPS ──────────────────────
       # Uncomment and configure if you deploy to a Linux server via SSH

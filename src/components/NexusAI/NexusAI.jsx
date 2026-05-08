@@ -6,7 +6,8 @@ import aiLogo from '/ai.png';
 import nexusLogo from '/flash.png';
 import './NexusAI.css';
 
-const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const OPENAI_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+
 
 const WELCOME = `Hey! I'm **Nexus AI** ✦
 
@@ -127,10 +128,10 @@ Reference these endpoints when answering. Use the actual URLs and methods in cod
     const text = input.trim();
     if (!text || streaming) return;
 
-    if (!GEMINI_KEY) {
+    if (!OPENAI_KEY) {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: '⚠️ **AI key not set.** Add `VITE_GEMINI_API_KEY` to your `.env` file.',
+        content: '⚠️ **AI key not set.** Add `VITE_OPENAI_API_KEY` to your `.env` file.',
         error: true,
       }]);
       return;
@@ -146,29 +147,21 @@ Reference these endpoints when answering. Use the actual URLs and methods in cod
 
     try {
       abortRef.current = new AbortController();
-      // Build Gemini contents array (system prompt prepended as first user turn)
-      const geminiContents = [
-        { role: 'user', parts: [{ text: buildSystemPrompt() }] },
-        { role: 'model', parts: [{ text: 'Understood. I am Nexus AI, ready to help with your API.' }] },
-        ...history.slice(1).map(m => ({
-          role: m.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: m.content }],
-        })),
-        { role: 'user', parts: [{ text: text }] },
-      ];
-
-      const resp = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${GEMINI_KEY}`,
-        {
-          method: 'POST',
-          signal: abortRef.current.signal,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: geminiContents,
-            generationConfig: { temperature: 0.35, maxOutputTokens: 4096 },
-          }),
-        }
-      );
+      const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        signal: abortRef.current.signal,
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_KEY}` },
+        body: JSON.stringify({
+          model: 'gpt-4o',
+          stream: true,
+          temperature: 0.35,
+          messages: [
+            { role: 'system', content: buildSystemPrompt() },
+            ...history,
+            userMsg,
+          ],
+        }),
+      });
 
       if (!resp.ok) {
         const err = await resp.json();
@@ -185,16 +178,14 @@ Reference these endpoints when answering. Use the actual URLs and methods in cod
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
-        buffer = lines.pop(); // keep incomplete last line
+        buffer = lines.pop();
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue;
           const data = line.slice(6).trim();
           if (!data || data === '[DONE]') continue;
           try {
-            // Gemini SSE format: candidates[0].content.parts[0].text
-            const chunk = JSON.parse(data);
-            const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            fullContent += text;
+            const delta = JSON.parse(data).choices?.[0]?.delta?.content || '';
+            fullContent += delta;
             setMessages(prev => {
               const copy = [...prev];
               copy[copy.length - 1] = { role: 'assistant', content: fullContent, streaming: true };

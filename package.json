@@ -93,6 +93,7 @@
     "axios": "^1.16.0",
     "form-data": "^4.0.5",
     "lucide-react": "^1.14.0",
+    "openai": "^6.37.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-markdown": "^10.1.0",
