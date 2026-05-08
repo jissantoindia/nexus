@@ -69,8 +69,7 @@
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "electron/entitlements.mac.plist",
-      "entitlementsInherit": "electron/entitlements.mac.plist",
-      "notarize": true
+      "entitlementsInherit": "electron/entitlements.mac.plist"
     },
     "linux": {
       "target": [
