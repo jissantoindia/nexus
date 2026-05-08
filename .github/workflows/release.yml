@@ -22,13 +22,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Import Developer ID Application certificate (skip if secret not set)
+      # Import Developer ID Application certificate (gracefully skipped if not set)
       - name: Import signing certificate
-        if: ${{ secrets.APPLE_CERTIFICATE_P12 != '' }}
         env:
           CERTIFICATE_P12:        ${{ secrets.APPLE_CERTIFICATE_P12 }}
           CERTIFICATE_PASSWORD:   ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
         run: |
+          # Skip if certificate secret is not configured yet
+          if [ -z "$CERTIFICATE_P12" ]; then
+            echo "⚠️  No signing certificate — building unsigned DMG"
+            exit 0
+          fi
+
           KEYCHAIN_PATH=$RUNNER_TEMP/build.keychain
           CERT_PATH=$RUNNER_TEMP/cert.p12
 
