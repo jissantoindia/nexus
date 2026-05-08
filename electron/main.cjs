@@ -4,7 +4,8 @@ const https   = require('https');
 const http    = require('http');
 const fs      = require('fs');
 const os      = require('os');
-const isDev   = require('electron-is-dev');
+// Native dev check — no external package needed
+const isDev   = !app.isPackaged;
 
 // ── Icon ──────────────────────────────────────────────────────────────────────
 const ICON_PATH = path.join(__dirname, 'icons/flash.png');

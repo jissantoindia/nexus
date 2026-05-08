@@ -14,11 +14,10 @@
     "setup": "node scripts/setup-appwrite.mjs",
     "setup:settings": "node scripts/setup-settings.mjs",
     "generate-icons": "python3 electron/generate-icons.py",
-
     "electron:dev": "concurrently -k -n \"VITE,ELECTRON\" -c \"blue,green\" \"vite --port 5173 --strictPort\" \"wait-on tcp:5173 && electron .\"",
-    "electron:build":       "cross-env ELECTRON_BUILD=true vite build && electron-builder",
-    "electron:build:win":   "cross-env ELECTRON_BUILD=true vite build && electron-builder --win",
-    "electron:build:mac":   "cross-env ELECTRON_BUILD=true vite build && electron-builder --mac",
+    "electron:build": "cross-env ELECTRON_BUILD=true vite build && electron-builder",
+    "electron:build:win": "cross-env ELECTRON_BUILD=true vite build && electron-builder --win",
+    "electron:build:mac": "cross-env ELECTRON_BUILD=true vite build && electron-builder --mac",
     "electron:build:linux": "cross-env ELECTRON_BUILD=true vite build && electron-builder --linux"
   },
   "build": {
@@ -35,11 +34,18 @@
       "node_modules/**/*",
       "package.json"
     ],
-      "extraMetadata": {
+    "extraMetadata": {
       "main": "electron/main.cjs"
     },
     "win": {
-      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "electron/icons/flash.ico"
     },
     "nsis": {
@@ -49,7 +55,15 @@
       "createStartMenuShortcut": true
     },
     "mac": {
-      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
       "icon": "electron/icons/flash.icns",
       "category": "public.app-category.developer-tools",
       "hardenedRuntime": true,
@@ -59,15 +73,24 @@
       "notarize": true
     },
     "linux": {
-      "target": [{ "target": "AppImage", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "electron/icons/flash.png",
       "category": "Development"
     },
-    "publish": [{
-      "provider": "github",
-      "owner": "jissantoindia",
-      "repo":  "nexus"
-    }]
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "jissantoindia",
+        "repo": "nexus"
+      }
+    ]
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -93,7 +116,6 @@
     "cross-env": "^10.1.0",
     "electron": "^42.0.0",
     "electron-builder": "^26.8.1",
-    "electron-is-dev": "^3.0.1",
     "eslint": "^10.2.1",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
