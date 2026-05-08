@@ -63,18 +63,23 @@ jobs:
           VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID: ${{ secrets.VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID }}
           VITE_GEMINI_API_KEY:                  ${{ secrets.VITE_GEMINI_API_KEY }}
 
-      # Sign, notarize, and staple in one step via electron-builder
-      - name: Package, sign & notarize macOS app
-        run: npx electron-builder --mac --publish always
+      # Sign + notarize if cert is configured, otherwise build unsigned DMG
+      - name: Package macOS app (signed if cert available)
+        run: |
+          if [ -z "$APPLE_CERTIFICATE_P12" ]; then
+            echo "⚠️  Building unsigned DMG (no signing cert configured)"
+            CSC_IDENTITY_AUTO_DISCOVERY=false npx electron-builder --mac --publish always
+          else
+            npx electron-builder --mac --publish always
+          fi
         env:
-          GH_TOKEN:               ${{ secrets.GH_TOKEN }}
-          # Signing
-          CSC_LINK:               ${{ secrets.APPLE_CERTIFICATE_P12 }}
-          CSC_KEY_PASSWORD:       ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          # Notarization (Apple ID + app-specific password + Team ID)
-          APPLE_ID:               ${{ secrets.APPLE_ID }}
+          GH_TOKEN:                    ${{ secrets.GH_TOKEN }}
+          APPLE_CERTIFICATE_P12:       ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          CSC_LINK:                    ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          CSC_KEY_PASSWORD:            ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_ID:                    ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID:          ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_TEAM_ID:               ${{ secrets.APPLE_TEAM_ID }}
 
   # ── Windows build (NSIS installer) ────────────────────────────────────────
   build-win:
