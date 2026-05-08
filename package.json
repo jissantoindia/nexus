@@ -65,11 +65,7 @@
         }
       ],
       "icon": "electron/icons/flash.icns",
-      "category": "public.app-category.developer-tools",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "electron/entitlements.mac.plist",
-      "entitlementsInherit": "electron/entitlements.mac.plist"
+      "category": "public.app-category.developer-tools"
     },
     "linux": {
       "target": [
