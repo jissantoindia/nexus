@@ -68,15 +68,18 @@ jobs:
         run: |
           if [ -z "$APPLE_CERTIFICATE_P12" ]; then
             echo "⚠️  Building unsigned DMG (no signing cert configured)"
-            CSC_IDENTITY_AUTO_DISCOVERY=false npx electron-builder --mac --publish always
+            CSC_IDENTITY_AUTO_DISCOVERY=false \
+            CSC_LINK="" \
+            npx electron-builder --mac --publish always
           else
+            CSC_LINK="$APPLE_CERTIFICATE_P12" \
+            CSC_KEY_PASSWORD="$APPLE_CERTIFICATE_PASSWORD" \
             npx electron-builder --mac --publish always
           fi
         env:
           GH_TOKEN:                    ${{ secrets.GH_TOKEN }}
           APPLE_CERTIFICATE_P12:       ${{ secrets.APPLE_CERTIFICATE_P12 }}
-          CSC_LINK:                    ${{ secrets.APPLE_CERTIFICATE_P12 }}
-          CSC_KEY_PASSWORD:            ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_CERTIFICATE_PASSWORD:  ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_ID:                    ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID:               ${{ secrets.APPLE_TEAM_ID }}
