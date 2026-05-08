@@ -22,8 +22,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Import Developer ID Application certificate from GitHub secret
+      # Import Developer ID Application certificate (skip if secret not set)
       - name: Import signing certificate
+        if: ${{ secrets.APPLE_CERTIFICATE_P12 != '' }}
         env:
           CERTIFICATE_P12:        ${{ secrets.APPLE_CERTIFICATE_P12 }}
           CERTIFICATE_PASSWORD:   ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
