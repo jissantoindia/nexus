@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { readFileSync } from 'fs'
 
+const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 const isElectronBuild = process.env.ELECTRON_BUILD === 'true';
 
 export default defineConfig({
@@ -76,4 +78,8 @@ export default defineConfig({
   // Electron needs relative asset paths (file:// protocol)
   // Web PWA uses absolute paths (/)
   base: isElectronBuild ? './' : '/',
+  // Inject package.json version so it's always correct in every build
+  define: {
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(pkg.version),
+  },
 })

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { getAppRelease } from '../appwrite/database';
 
-// Current app version — bump this in package.json and here when you release
-export const CURRENT_VERSION = '1.0.0';
+// Version is injected at build time from package.json via VITE_APP_VERSION
+export const CURRENT_VERSION = import.meta.env.VITE_APP_VERSION || '1.0.0';
 
 /**
  * Compare semver strings. Returns true if `remote` is newer than `current`.
