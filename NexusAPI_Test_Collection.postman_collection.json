@@ -1,0 +1,865 @@
+{
+  "info": {
+    "name": "NexusAPI Test Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "JSONPlaceholder - Users",
+      "item": [
+        {
+          "name": "GET All Users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/users"
+            }
+          }
+        },
+        {
+          "name": "GET User by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/users/1"
+            }
+          }
+        },
+        {
+          "name": "POST Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Jane Doe\",\"username\":\"janedoe\",\"email\":\"jane@example.com\"}"
+            },
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/users"
+            }
+          }
+        },
+        {
+          "name": "PUT Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Jane Updated\",\"email\":\"jane2@example.com\"}"
+            },
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/users/1"
+            }
+          }
+        },
+        {
+          "name": "DELETE User",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/users/1"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "JSONPlaceholder - Posts",
+      "item": [
+        {
+          "name": "GET All Posts",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/posts"
+            }
+          }
+        },
+        {
+          "name": "GET Post by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/posts/1"
+            }
+          }
+        },
+        {
+          "name": "GET Posts by User",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/posts?userId=1",
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Create Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"New Post\",\"body\":\"Body text\",\"userId\":1}"
+            },
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/posts"
+            }
+          }
+        },
+        {
+          "name": "PATCH Update Post",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Updated Title\"}"
+            },
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/posts/1"
+            }
+          }
+        },
+        {
+          "name": "DELETE Post",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/posts/1"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "JSONPlaceholder - Comments",
+      "item": [
+        {
+          "name": "GET All Comments",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/comments"
+            }
+          }
+        },
+        {
+          "name": "GET Comments for Post",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/comments?postId=1"
+            }
+          }
+        },
+        {
+          "name": "GET Comment by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/comments/1"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "JSONPlaceholder - Todos",
+      "item": [
+        {
+          "name": "GET All Todos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/todos"
+            }
+          }
+        },
+        {
+          "name": "GET Todo by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/todos/1"
+            }
+          }
+        },
+        {
+          "name": "POST Create Todo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Buy milk\",\"completed\":false,\"userId\":1}"
+            },
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/todos"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ReqRes - Auth",
+      "item": [
+        {
+          "name": "POST Register Success",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"eve.holt@reqres.in\",\"password\":\"pistol\"}"
+            },
+            "url": {
+              "raw": "https://reqres.in/api/register"
+            }
+          }
+        },
+        {
+          "name": "POST Register Fail",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"sydney@fife\"}"
+            },
+            "url": {
+              "raw": "https://reqres.in/api/register"
+            }
+          }
+        },
+        {
+          "name": "POST Login Success",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"eve.holt@reqres.in\",\"password\":\"cityslicka\"}"
+            },
+            "url": {
+              "raw": "https://reqres.in/api/login"
+            }
+          }
+        },
+        {
+          "name": "POST Login Fail",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"peter@klaven\"}"
+            },
+            "url": {
+              "raw": "https://reqres.in/api/login"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ReqRes - Users",
+      "item": [
+        {
+          "name": "GET List Users Page 1",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://reqres.in/api/users?page=1"
+            }
+          }
+        },
+        {
+          "name": "GET List Users Page 2",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://reqres.in/api/users?page=2"
+            }
+          }
+        },
+        {
+          "name": "GET Single User",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://reqres.in/api/users/2"
+            }
+          }
+        },
+        {
+          "name": "GET User Not Found 404",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://reqres.in/api/users/23"
+            }
+          }
+        },
+        {
+          "name": "POST Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"morpheus\",\"job\":\"leader\"}"
+            },
+            "url": {
+              "raw": "https://reqres.in/api/users"
+            }
+          }
+        },
+        {
+          "name": "PUT Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"morpheus\",\"job\":\"zion resident\"}"
+            },
+            "url": {
+              "raw": "https://reqres.in/api/users/2"
+            }
+          }
+        },
+        {
+          "name": "DELETE User",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "https://reqres.in/api/users/2"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "DummyJSON - Products",
+      "item": [
+        {
+          "name": "GET All Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://dummyjson.com/products"
+            }
+          }
+        },
+        {
+          "name": "GET Product by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://dummyjson.com/products/1"
+            }
+          }
+        },
+        {
+          "name": "GET Search Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://dummyjson.com/products/search?q=phone"
+            }
+          }
+        },
+        {
+          "name": "GET Products by Category",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://dummyjson.com/products/category/smartphones"
+            }
+          }
+        },
+        {
+          "name": "POST Add Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"New Phone\",\"price\":499,\"description\":\"A great phone\",\"category\":\"smartphones\"}"
+            },
+            "url": {
+              "raw": "https://dummyjson.com/products/add"
+            }
+          }
+        },
+        {
+          "name": "PATCH Update Product",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"iPhone 9 Pro\"}"
+            },
+            "url": {
+              "raw": "https://dummyjson.com/products/1"
+            }
+          }
+        },
+        {
+          "name": "DELETE Product",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "https://dummyjson.com/products/1"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "DummyJSON - Auth",
+      "item": [
+        {
+          "name": "POST Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"emilys\",\"password\":\"emilyspass\",\"expiresInMins\":30}"
+            },
+            "url": {
+              "raw": "https://dummyjson.com/auth/login"
+            }
+          }
+        },
+        {
+          "name": "GET Me (requires token)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_TOKEN_HERE"
+              }
+            ],
+            "url": {
+              "raw": "https://dummyjson.com/auth/me"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "DummyJSON - Carts",
+      "item": [
+        {
+          "name": "GET All Carts",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://dummyjson.com/carts"
+            }
+          }
+        },
+        {
+          "name": "GET Cart by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://dummyjson.com/carts/1"
+            }
+          }
+        },
+        {
+          "name": "POST Add Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"userId\":1,\"products\":[{\"id\":1,\"quantity\":2},{\"id\":50,\"quantity\":1}]}"
+            },
+            "url": {
+              "raw": "https://dummyjson.com/carts/add"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "HTTPBin - Inspection",
+      "item": [
+        {
+          "name": "GET Request Info",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Custom-Header",
+                "value": "NexusAPI"
+              }
+            ],
+            "url": {
+              "raw": "https://httpbin.org/get"
+            }
+          }
+        },
+        {
+          "name": "POST Echo Body",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"hello\":\"NexusAPI\",\"number\":42}"
+            },
+            "url": {
+              "raw": "https://httpbin.org/post"
+            }
+          }
+        },
+        {
+          "name": "GET My IP",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://httpbin.org/ip"
+            }
+          }
+        },
+        {
+          "name": "GET UUID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://httpbin.org/uuid"
+            }
+          }
+        },
+        {
+          "name": "GET Delay 1s",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://httpbin.org/delay/1"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "HTTPBin - Status Codes",
+      "item": [
+        {
+          "name": "GET 200 OK",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://httpbin.org/status/200"
+            }
+          }
+        },
+        {
+          "name": "GET 201 Created",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://httpbin.org/status/201"
+            }
+          }
+        },
+        {
+          "name": "GET 400 Bad Request",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://httpbin.org/status/400"
+            }
+          }
+        },
+        {
+          "name": "GET 401 Unauthorized",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://httpbin.org/status/401"
+            }
+          }
+        },
+        {
+          "name": "GET 404 Not Found",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://httpbin.org/status/404"
+            }
+          }
+        },
+        {
+          "name": "GET 500 Server Error",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://httpbin.org/status/500"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "HTTPBin - Auth",
+      "item": [
+        {
+          "name": "GET Bearer Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer test-token-123"
+              }
+            ],
+            "url": {
+              "raw": "https://httpbin.org/bearer"
+            }
+          }
+        },
+        {
+          "name": "GET Basic Auth",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "user"
+                },
+                {
+                  "key": "password",
+                  "value": "pass"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://httpbin.org/basic-auth/user/pass"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "GitHub API",
+      "item": [
+        {
+          "name": "GET User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/vnd.github.v3+json"
+              }
+            ],
+            "url": {
+              "raw": "https://api.github.com/users/octocat"
+            }
+          }
+        },
+        {
+          "name": "GET User Repos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/vnd.github.v3+json"
+              }
+            ],
+            "url": {
+              "raw": "https://api.github.com/users/octocat/repos"
+            }
+          }
+        },
+        {
+          "name": "GET Search Repos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/vnd.github.v3+json"
+              }
+            ],
+            "url": {
+              "raw": "https://api.github.com/search/repositories?q=react&sort=stars"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Random User API",
+      "item": [
+        {
+          "name": "GET 1 Random User",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://randomuser.me/api/"
+            }
+          }
+        },
+        {
+          "name": "GET 5 Random Users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://randomuser.me/api/?results=5"
+            }
+          }
+        },
+        {
+          "name": "GET Female Users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://randomuser.me/api/?gender=female&results=3"
+            }
+          }
+        },
+        {
+          "name": "GET Users from India",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://randomuser.me/api/?nat=in&results=5"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PokeAPI",
+      "item": [
+        {
+          "name": "GET Pokemon by Name",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://pokeapi.co/api/v2/pokemon/pikachu"
+            }
+          }
+        },
+        {
+          "name": "GET Pokemon List",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://pokeapi.co/api/v2/pokemon?limit=10"
+            }
+          }
+        },
+        {
+          "name": "GET Pokemon Types",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://pokeapi.co/api/v2/type"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; height: var(--topbar-h);
+  background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.topbar-tabs { display: flex; gap: 2px; }
+.topbar-tab {
+  padding: 8px 16px; background: transparent; border: none;
+  border-bottom: 2px solid transparent; color: var(--text-secondary);
+  cursor: pointer; font-size: 13px; font-weight: 500;
+  font-family: var(--font); transition: var(--transition);
+  margin-bottom: -1px;
+}
+.topbar-tab:hover { color: var(--text-primary); }
+.topbar-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Main layout — sidebar + main area + AI panel */
+.app-shell { display: flex; height: 100vh; overflow: hidden; }
+.main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }

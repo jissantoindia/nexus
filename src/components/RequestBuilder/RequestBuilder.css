@@ -1,0 +1,105 @@
+.request-builder {
+  display: flex; flex-direction: column;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+}
+
+.rb-topbar { padding: 12px 16px 0; display: flex; flex-direction: column; gap: 8px; }
+
+.rb-name-row { display: flex; align-items: center; gap: 8px; }
+.rb-name { flex: 1; padding: 5px 10px; font-size: 13px; background: transparent; border-color: transparent; }
+.rb-name:focus { background: var(--bg-tertiary); border-color: var(--accent); }
+
+.rb-url-row { display: flex; align-items: center; gap: 8px; }
+
+.method-select {
+  padding: 8px 10px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-tertiary);
+  font-size: 12px; font-weight: 700; font-family: var(--font-mono);
+  cursor: pointer; outline: none; transition: var(--transition);
+  min-width: 96px;
+}
+.method-select.method-GET    { color: #22d3a0; }
+.method-select.method-POST   { color: #f5a623; }
+.method-select.method-PUT    { color: #60a5fa; }
+.method-select.method-PATCH  { color: #a78bfa; }
+.method-select.method-DELETE { color: #ef4444; }
+.method-select.method-HEAD, .method-select.method-OPTIONS { color: #22d3ee; }
+
+.rb-url { flex: 1; font-family: var(--font-mono); font-size: 13px; }
+.rb-send { min-width: 100px; gap: 7px; }
+
+.rb-tabs { padding: 0 16px; margin-top: 4px; }
+.tab-count {
+  background: var(--accent-dim); color: var(--accent);
+  border-radius: 10px; padding: 0 5px;
+  font-size: 10px; font-weight: 700; margin-left: 2px;
+}
+
+.rb-panel { padding: 12px 16px; overflow-y: auto; max-height: 260px; }
+
+/* KV Editor */
+.kv-editor { overflow-x: auto; }
+.kv-input { padding: 5px 8px; font-size: 12px; font-family: var(--font-mono); }
+
+/* Auth Editor */
+.auth-editor { max-width: 480px; }
+.auth-type-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.auth-fields { display: flex; flex-direction: column; gap: 4px; }
+.field-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+
+/* Body Editor */
+.body-editor { display: flex; flex-direction: column; gap: 10px; }
+.body-type-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.body-type-btn {
+  padding: 4px 12px; border-radius: 20px; font-size: 12px;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-secondary); cursor: pointer; transition: var(--transition); font-family: var(--font);
+}
+.body-type-btn:hover { border-color: var(--accent); color: var(--accent); }
+.body-type-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+/* Auto Content-Type hint */
+.body-type-hint {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  padding: 3px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* None message */
+.body-none-msg {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 12px 0;
+  font-style: italic;
+}
+
+/* KV body table */
+.body-kv-wrap { overflow-x: auto; }
+.body-kv-table { width: 100%; border-collapse: collapse; }
+.body-kv-table th {
+  text-align: left; padding: 5px 8px; font-size: 11px; font-weight: 600;
+  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+
+.body-textarea { min-height: 160px; font-family: var(--font-mono); font-size: 13px; }
+
+.rb-no-body { color: var(--text-muted); font-size: 13px; padding: 16px 0; }
+.rb-desc { padding: 4px 0; }
+
+/* ── Base URL badge in URL bar ── */
+.rb-url-row { display: flex; gap: 8px; padding: 8px 12px; align-items: center; }
+.rb-url-wrap { flex: 1; display: flex; align-items: center; position: relative; background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; transition: border-color var(--transition); }
+.rb-url-wrap:focus-within { border-color: var(--accent); }
+.rb-url-wrap .rb-url { border: none; background: transparent; padding-left: 8px; flex: 1; }
+.rb-url-wrap .rb-url:focus { outline: none; box-shadow: none; }
+.rb-baseurl-badge { display: flex; align-items: center; gap: 5px; padding: 0 10px; height: 100%; background: var(--accent-dim); border-right: 1px solid rgba(99,102,241,0.25); cursor: pointer; border-radius: 0; white-space: nowrap; flex-shrink: 0; color: var(--accent); font-size: 11px; font-weight: 600; transition: background var(--transition); }
+.rb-baseurl-badge:hover { background: rgba(99,102,241,0.2); }
+.rb-baseurl-text { max-width: 120px; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-mono); font-size: 11px; }

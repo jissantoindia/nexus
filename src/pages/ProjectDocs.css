@@ -1,0 +1,221 @@
+/* ── Page shell ──────────────────────────────────────────────────────────────── */
+.project-docs-page {
+  display: flex; flex-direction: column;
+  height: 100vh; background: var(--bg-primary); overflow: hidden;
+}
+
+/* ── Header ── */
+.pd-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 20px; background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.pd-title { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.pd-title h1 { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+.pd-title-icon { color: var(--accent); flex-shrink: 0; }
+.pd-gen-time { font-size: 11px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+.pd-actions { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
+
+/* ── Password panel ── */
+.pd-pass-panel {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px; background: rgba(249,115,22,0.06);
+  border-bottom: 1px solid rgba(249,115,22,0.2); flex-shrink: 0;
+  animation: slideDown 0.2s ease;
+}
+@keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+
+/* ── Batch progress bar ── */
+.pd-batch-bar {
+  position: relative; height: 34px; background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border); flex-shrink: 0; overflow: hidden;
+}
+.pd-batch-fill {
+  position: absolute; inset: 0; height: 100%;
+  background: linear-gradient(90deg, rgba(99,102,241,0.25), rgba(34,211,238,0.2));
+  transition: width 0.4s ease;
+}
+.pd-batch-label {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 6px; height: 100%;
+  padding: 0 16px; font-size: 12px; color: var(--text-secondary);
+}
+
+/* ── Loading ── */
+.pd-loading-full {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px; color: var(--text-muted); font-size: 14px;
+}
+
+/* ── Empty / No Doc state ── */
+.pd-no-doc {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 48px 24px; gap: 12px;
+  overflow-y: auto;
+}
+.pd-no-doc-icon { color: var(--accent); opacity: 0.5; margin-bottom: 8px; }
+.pd-no-doc h2 { font-size: 22px; font-weight: 700; margin: 0; }
+.pd-no-doc p { color: var(--text-muted); font-size: 14px; max-width: 480px; line-height: 1.6; margin: 0; }
+.pd-folder-preview { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; max-width: 560px; }
+.pd-folder-preview-title { width: 100%; font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 4px; }
+.pd-folder-chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px; background: var(--bg-secondary);
+  border: 1px solid var(--border); border-radius: 20px; font-size: 12px;
+}
+.pd-folder-chip-count {
+  background: var(--accent-dim); color: var(--accent);
+  font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px;
+}
+
+/* ── Layout ── */
+.pd-layout { display: flex; flex: 1; overflow: hidden; }
+
+/* ── TOC (left sidebar) ── */
+.pd-toc {
+  width: 260px; min-width: 260px; border-right: 1px solid var(--border);
+  background: var(--bg-secondary); display: flex; flex-direction: column;
+  overflow: hidden; flex-shrink: 0;
+}
+.pd-toc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-bottom: 1px solid var(--border-light);
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-muted); flex-shrink: 0;
+}
+.pd-toc-count { font-size: 10px; color: var(--accent); background: var(--accent-dim); padding: 1px 7px; border-radius: 10px; }
+.pd-toc-scroll { flex: 1; overflow-y: auto; padding: 6px 0; }
+
+.pd-toc-section { margin-bottom: 4px; }
+.pd-toc-root-label { padding: 4px 14px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.pd-toc-folder {
+  display: flex; align-items: center; gap: 6px;
+  width: 100%; text-align: left; padding: 6px 14px;
+  font-size: 12px; font-weight: 600; color: var(--text-secondary);
+  background: transparent; border: none; cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.pd-toc-folder:hover { background: var(--bg-hover); color: var(--accent); }
+.pd-toc-folder > span:nth-child(2) { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pd-toc-folder-count { font-size: 10px; font-weight: 700; color: var(--text-muted); flex-shrink: 0; }
+.pd-toc-item {
+  display: flex; align-items: center; gap: 6px;
+  width: 100%; text-align: left; padding: 5px 14px 5px 24px;
+  font-size: 11px; color: var(--text-muted);
+  background: transparent; border: none; cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.pd-toc-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+.pd-toc-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── TOC publish panel ── */
+.pd-toc-publish {
+  padding: 12px 14px; border-top: 1px solid var(--border);
+  background: var(--bg-tertiary); flex-shrink: 0;
+}
+.pd-toc-publish-title {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.pd-toc-url {
+  display: block; font-size: 10px; font-family: var(--font-mono);
+  color: var(--cyan); word-break: break-all; line-height: 1.5;
+  background: var(--bg-primary); padding: 4px 8px; border-radius: 4px;
+}
+
+/* ── Main scrollable doc area ── */
+.pd-doc-main {
+  flex: 1; overflow-y: auto; /* THIS IS THE KEY FIX — must be scroll not hidden */
+  background: var(--bg-primary);
+}
+.pd-doc-body {
+  max-width: 860px; margin: 0 auto; padding: 32px 40px 80px;
+}
+
+/* ── Doc intro ── */
+.pd-doc-intro { margin-bottom: 40px; padding-bottom: 24px; border-bottom: 2px solid var(--border); }
+.pd-doc-intro h1 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+.pd-doc-subtitle {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--text-muted); flex-wrap: wrap;
+}
+.pd-doc-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 12px;
+}
+.pd-doc-badge.public { background: rgba(34,211,160,0.1); color: var(--green); }
+.pd-doc-badge.protected { background: rgba(249,115,22,0.1); color: var(--orange); }
+.pd-doc-description { font-size: 14px; color: var(--text-secondary); margin-top: 12px; line-height: 1.6; }
+
+/* ── Folder section ── */
+.pd-doc-section { margin-bottom: 48px; }
+.pd-doc-folder-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 0 14px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 24px;
+}
+.pd-doc-folder-header h2 { font-size: 18px; font-weight: 700; margin: 0; flex: 1; }
+.pd-doc-folder-count {
+  font-size: 11px; color: var(--accent);
+  background: var(--accent-dim); padding: 2px 9px; border-radius: 12px;
+  font-weight: 600;
+}
+
+/* ── Endpoint block ── */
+.pd-doc-endpoint {
+  margin-bottom: 36px;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden;
+}
+.pd-doc-endpoint-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+.pd-doc-endpoint-url {
+  font-family: var(--font-mono); font-size: 13px;
+  color: var(--text-secondary); flex: 1; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.pd-doc-endpoint-name { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+.pd-edit-badge { font-size: 10px; color: var(--orange); background: rgba(249,115,22,0.1); padding: 1px 6px; border-radius: 8px; }
+
+/* ── Markdown content ── */
+.pd-doc-markdown { padding: 20px 24px; }
+.pd-doc-markdown p { margin: 0 0 10px; font-size: 14px; line-height: 1.7; color: var(--text-primary); }
+.pd-doc-markdown p:last-child { margin: 0; }
+.pd-doc-markdown h1, .pd-doc-markdown h2, .pd-doc-markdown h3 { margin: 16px 0 8px; font-weight: 600; }
+.pd-doc-markdown h2 { font-size: 15px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.pd-doc-markdown h3 { font-size: 13px; color: var(--accent); }
+.pd-doc-markdown code:not(pre code) {
+  font-family: var(--font-mono); font-size: 12px;
+  background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; color: var(--cyan);
+}
+.pd-doc-markdown pre { margin: 10px 0; border-radius: var(--radius-sm); overflow: auto; font-size: 12px; }
+.pd-doc-markdown table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 10px 0; }
+.pd-doc-markdown th { background: var(--bg-tertiary); padding: 8px 12px; text-align: left; border: 1px solid var(--border); font-size: 12px; }
+.pd-doc-markdown td { padding: 7px 12px; border: 1px solid var(--border); font-size: 13px; vertical-align: top; }
+.pd-doc-markdown tr:nth-child(even) td { background: var(--bg-secondary); }
+.pd-doc-markdown ul, .pd-doc-markdown ol { padding-left: 20px; margin: 6px 0; }
+.pd-doc-markdown li { margin-bottom: 3px; font-size: 14px; line-height: 1.6; }
+.pd-doc-markdown blockquote { border-left: 3px solid var(--accent); padding-left: 12px; margin: 10px 0; color: var(--text-muted); font-style: italic; }
+
+/* ── Textarea for editing ── */
+.pd-doc-textarea {
+  width: 100%; min-height: 300px; resize: vertical;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.6;
+  border: none; border-radius: 0; padding: 16px 24px;
+  background: var(--bg-tertiary);
+}
+
+/* ── Footer ── */
+.pd-doc-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 0; border-top: 1px solid var(--border);
+  margin-top: 40px; font-size: 12px; color: var(--text-muted);
+}
+.pd-doc-footer-actions { display: flex; gap: 8px; }

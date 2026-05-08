@@ -1,0 +1,178 @@
+name: Build & Release Nexus
+
+# Trigger: push a version tag like v1.0.0, v1.2.3, etc.
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  # ── macOS build (DMG for Intel + Apple Silicon) ────────────────────────────
+  build-mac:
+    name: macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web (Vite)
+        run: npm run build
+        env:
+          ELECTRON_BUILD: true
+          VITE_APPWRITE_ENDPOINT:            ${{ secrets.VITE_APPWRITE_ENDPOINT }}
+          VITE_APPWRITE_PROJECT_ID:          ${{ secrets.VITE_APPWRITE_PROJECT_ID }}
+          VITE_APPWRITE_DATABASE_ID:         ${{ secrets.VITE_APPWRITE_DATABASE_ID }}
+          VITE_APPWRITE_PROJECTS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_PROJECTS_COLLECTION_ID }}
+          VITE_APPWRITE_REQUESTS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_REQUESTS_COLLECTION_ID }}
+          VITE_APPWRITE_DOCS_COLLECTION_ID:     ${{ secrets.VITE_APPWRITE_DOCS_COLLECTION_ID }}
+          VITE_APPWRITE_MEMBERS_COLLECTION_ID:  ${{ secrets.VITE_APPWRITE_MEMBERS_COLLECTION_ID }}
+          VITE_APPWRITE_FEEDBACK_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_FEEDBACK_COLLECTION_ID }}
+          VITE_APPWRITE_SETTINGS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_SETTINGS_COLLECTION_ID }}
+          VITE_APPWRITE_FEEDBACK_BUCKET_ID:     ${{ secrets.VITE_APPWRITE_FEEDBACK_BUCKET_ID }}
+          VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID: ${{ secrets.VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID }}
+          VITE_GEMINI_API_KEY:               ${{ secrets.VITE_GEMINI_API_KEY }}
+
+      - name: Package macOS app
+        run: npx electron-builder --mac --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  # ── Windows build (NSIS installer) ────────────────────────────────────────
+  build-win:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web (Vite)
+        run: npm run build
+        env:
+          ELECTRON_BUILD: true
+          VITE_APPWRITE_ENDPOINT:            ${{ secrets.VITE_APPWRITE_ENDPOINT }}
+          VITE_APPWRITE_PROJECT_ID:          ${{ secrets.VITE_APPWRITE_PROJECT_ID }}
+          VITE_APPWRITE_DATABASE_ID:         ${{ secrets.VITE_APPWRITE_DATABASE_ID }}
+          VITE_APPWRITE_PROJECTS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_PROJECTS_COLLECTION_ID }}
+          VITE_APPWRITE_REQUESTS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_REQUESTS_COLLECTION_ID }}
+          VITE_APPWRITE_DOCS_COLLECTION_ID:     ${{ secrets.VITE_APPWRITE_DOCS_COLLECTION_ID }}
+          VITE_APPWRITE_MEMBERS_COLLECTION_ID:  ${{ secrets.VITE_APPWRITE_MEMBERS_COLLECTION_ID }}
+          VITE_APPWRITE_FEEDBACK_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_FEEDBACK_COLLECTION_ID }}
+          VITE_APPWRITE_SETTINGS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_SETTINGS_COLLECTION_ID }}
+          VITE_APPWRITE_FEEDBACK_BUCKET_ID:     ${{ secrets.VITE_APPWRITE_FEEDBACK_BUCKET_ID }}
+          VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID: ${{ secrets.VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID }}
+          VITE_GEMINI_API_KEY:               ${{ secrets.VITE_GEMINI_API_KEY }}
+
+      - name: Package Windows app
+        run: npx electron-builder --win --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  # ── Linux build (AppImage) ─────────────────────────────────────────────────
+  build-linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install system deps (AppImage)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libglib2.0-dev libgtk-3-dev libnotify-dev \
+            libgconf-2-4 libnss3 libxss1 libxtst6 \
+            xauth xvfb fuse libfuse2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web (Vite)
+        run: npm run build
+        env:
+          ELECTRON_BUILD: true
+          VITE_APPWRITE_ENDPOINT:            ${{ secrets.VITE_APPWRITE_ENDPOINT }}
+          VITE_APPWRITE_PROJECT_ID:          ${{ secrets.VITE_APPWRITE_PROJECT_ID }}
+          VITE_APPWRITE_DATABASE_ID:         ${{ secrets.VITE_APPWRITE_DATABASE_ID }}
+          VITE_APPWRITE_PROJECTS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_PROJECTS_COLLECTION_ID }}
+          VITE_APPWRITE_REQUESTS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_REQUESTS_COLLECTION_ID }}
+          VITE_APPWRITE_DOCS_COLLECTION_ID:     ${{ secrets.VITE_APPWRITE_DOCS_COLLECTION_ID }}
+          VITE_APPWRITE_MEMBERS_COLLECTION_ID:  ${{ secrets.VITE_APPWRITE_MEMBERS_COLLECTION_ID }}
+          VITE_APPWRITE_FEEDBACK_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_FEEDBACK_COLLECTION_ID }}
+          VITE_APPWRITE_SETTINGS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_SETTINGS_COLLECTION_ID }}
+          VITE_APPWRITE_FEEDBACK_BUCKET_ID:     ${{ secrets.VITE_APPWRITE_FEEDBACK_BUCKET_ID }}
+          VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID: ${{ secrets.VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID }}
+          VITE_GEMINI_API_KEY:               ${{ secrets.VITE_GEMINI_API_KEY }}
+
+      - name: Package Linux app
+        run: npx electron-builder --linux --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  # ── Web build → deploy to server ──────────────────────────────────────────
+  build-web:
+    name: Web (PWA)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build PWA
+        run: npm run build
+        env:
+          VITE_APPWRITE_ENDPOINT:            ${{ secrets.VITE_APPWRITE_ENDPOINT }}
+          VITE_APPWRITE_PROJECT_ID:          ${{ secrets.VITE_APPWRITE_PROJECT_ID }}
+          VITE_APPWRITE_DATABASE_ID:         ${{ secrets.VITE_APPWRITE_DATABASE_ID }}
+          VITE_APPWRITE_PROJECTS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_PROJECTS_COLLECTION_ID }}
+          VITE_APPWRITE_REQUESTS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_REQUESTS_COLLECTION_ID }}
+          VITE_APPWRITE_DOCS_COLLECTION_ID:     ${{ secrets.VITE_APPWRITE_DOCS_COLLECTION_ID }}
+          VITE_APPWRITE_MEMBERS_COLLECTION_ID:  ${{ secrets.VITE_APPWRITE_MEMBERS_COLLECTION_ID }}
+          VITE_APPWRITE_FEEDBACK_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_FEEDBACK_COLLECTION_ID }}
+          VITE_APPWRITE_SETTINGS_COLLECTION_ID: ${{ secrets.VITE_APPWRITE_SETTINGS_COLLECTION_ID }}
+          VITE_APPWRITE_FEEDBACK_BUCKET_ID:     ${{ secrets.VITE_APPWRITE_FEEDBACK_BUCKET_ID }}
+          VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID: ${{ secrets.VITE_APPWRITE_MANAGE_USERS_FUNCTION_ID }}
+          VITE_GEMINI_API_KEY:               ${{ secrets.VITE_GEMINI_API_KEY }}
+
+      # ── Option A: Deploy via rsync/SSH to your VPS ──────────────────────
+      # Uncomment and configure if you deploy to a Linux server via SSH
+      # - name: Deploy to server
+      #   uses: easingthemes/ssh-deploy@main
+      #   with:
+      #     SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      #     ARGS: "-rlgoDzvc --delete"
+      #     SOURCE: "dist/"
+      #     REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+      #     REMOTE_USER: ${{ secrets.DEPLOY_USER }}
+      #     TARGET: /var/www/nexus/
+
+      # ── Option B: Upload dist as artifact (download from Actions tab) ───
+      - name: Upload web build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-web-${{ github.ref_name }}
+          path: dist/
+          retention-days: 30

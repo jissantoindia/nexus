@@ -1,0 +1,130 @@
+.admin-page { display: flex; flex-direction: column; height: 100vh; background: var(--bg-primary); overflow: hidden; }
+
+.admin-key-warning {
+  display: flex; align-items: flex-start; gap: 14px;
+  margin: 24px; padding: 20px 24px;
+  background: rgba(249,115,22,0.08);
+  border: 1px solid rgba(249,115,22,0.3);
+  border-radius: var(--radius);
+  color: var(--orange);
+  animation: fadeIn 0.2s ease;
+}
+.admin-key-warning svg { flex-shrink: 0; margin-top: 2px; }
+.admin-key-warning strong { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--orange); }
+.admin-key-warning p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 10px; }
+.admin-key-warning code { font-family: var(--font-mono); background: var(--bg-tertiary); padding: 1px 6px; border-radius: 4px; font-size: 12px; color: var(--accent); }
+.admin-key-hint {
+  font-family: var(--font-mono); font-size: 12px;
+  background: var(--bg-tertiary); padding: 8px 12px;
+  border-radius: var(--radius-sm); color: var(--text-secondary);
+  border: 1px solid var(--border); margin: 0;
+}
+
+
+.admin-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 24px; background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.admin-title { display: flex; align-items: center; gap: 8px; flex: 1; }
+.admin-title h1 { font-size: 16px; font-weight: 600; }
+.admin-title svg { color: var(--accent); }
+.admin-actions { display: flex; gap: 8px; }
+
+.admin-create-bar {
+  padding: 12px 24px; background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+  animation: slideDown 0.2s ease;
+}
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+.admin-create-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.admin-create-form .input { flex: 1; min-width: 160px; }
+
+.admin-content { flex: 1; overflow: auto; padding: 24px; }
+.admin-loading { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 60px; color: var(--text-muted); }
+
+.admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.admin-table th {
+  text-align: left; padding: 10px 16px;
+  color: var(--text-muted); font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border); background: var(--bg-secondary);
+}
+.admin-table td { padding: 12px 16px; border-bottom: 1px solid var(--border-light); }
+.admin-table tr:hover td { background: var(--bg-hover); }
+.admin-table tr.user-blocked td { opacity: 0.5; }
+
+.user-cell { display: flex; align-items: center; gap: 10px; }
+.user-cell-avatar {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent), var(--cyan));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff;
+}
+.user-email-cell { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; }
+
+.label-list { display: flex; gap: 4px; flex-wrap: wrap; }
+.user-label { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: var(--accent-dim); color: var(--accent); }
+.user-label-none { font-size: 10px; color: var(--text-muted); }
+
+.status-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.status-badge.active { background: rgba(34,211,160,0.1); color: var(--green); border: 1px solid rgba(34,211,160,0.3); }
+.status-badge.blocked { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+
+.user-action-btns { display: flex; gap: 6px; }
+
+.admin-footer {
+  padding: 12px 24px; border-top: 1px solid var(--border);
+  background: var(--bg-secondary); font-size: 12px; color: var(--text-muted);
+}
+.admin-footer code { font-family: var(--font-mono); background: var(--bg-tertiary); padding: 1px 6px; border-radius: 4px; }
+
+/* ── App Release Management ─────────────────────────────────────────────────── */
+.admin-release-section {
+  margin: 32px 24px;
+  padding: 24px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.admin-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.admin-section-title svg { color: var(--accent); flex-shrink: 0; }
+.admin-section-title h2 { font-size: 15px; font-weight: 700; margin: 0; color: var(--text-primary); }
+.admin-section-subtitle { font-size: 12px; color: var(--text-muted); flex: 1; min-width: 200px; }
+
+.admin-release-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.admin-release-field { display: flex; flex-direction: column; gap: 6px; }
+.admin-release-field.full-width { grid-column: 1 / -1; }
+
+.admin-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.admin-field-label .required { color: var(--red); }
+.admin-field-optional { font-weight: 400; color: var(--text-muted); }
+.admin-field-hint { font-size: 11px; color: var(--text-muted); }
+
+.admin-release-input { font-size: 13px; }
+.admin-release-notes { resize: vertical; min-height: 70px; font-size: 13px; line-height: 1.5; }
+
+.admin-release-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}

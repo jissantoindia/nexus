@@ -1,0 +1,188 @@
+.shared-doc-page {
+  min-height: 100vh; background: var(--bg-primary); overflow-y: auto;
+  font-family: var(--font); color: var(--text-primary);
+}
+.sd-loading, .sd-error {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 100vh; gap: 16px; color: var(--text-muted);
+}
+.sd-spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; }
+
+.sd-password-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.sd-pw-card { padding: 40px; display: flex; flex-direction: column; align-items: center; gap: 16px; max-width: 380px; text-align: center; }
+.sd-pw-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--accent-dim); display: flex; align-items: center; justify-content: center; color: var(--accent); }
+.sd-pw-card h2 { font-size: 20px; font-weight: 700; }
+.sd-pw-card p { color: var(--text-muted); font-size: 14px; }
+.sd-pw-card .input { width: 100%; }
+.sd-pw-error {
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease;
+  margin-top: -4px;
+}
+
+.sd-header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+.sd-header-inner { max-width: 1200px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 16px; }
+.sd-logo { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; color: var(--accent); }
+.sd-logo-img { width: 22px; height: 22px; border-radius: 6px; object-fit: cover; display: block; }
+.sd-endpoint { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.sd-url { font-family: var(--font-mono); font-size: 13px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.sd-layout { display: flex; max-width: 1200px; margin: 0 auto; padding: 0 24px; gap: 24px; }
+.sd-main { flex: 1; min-width: 0; padding: 24px 0; }
+.sd-try-panel { width: 320px; flex-shrink: 0; padding: 20px; margin: 24px 0; height: fit-content; position: sticky; top: 72px; display: flex; flex-direction: column; gap: 10px; }
+.sd-try-title { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.sd-try-btn { width: 100%; }
+.sd-try-result { margin-top: 8px; }
+.sd-try-error { color: var(--red); font-size: 12px; }
+.sd-try-status { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.sd-try-body { font-family: var(--font-mono); font-size: 12px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; overflow: auto; max-height: 300px; white-space: pre; color: var(--text-secondary); }
+
+/* Reuse from DocViewer */
+.field-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.rv-meta { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
+
+@media (max-width: 768px) {
+  .sd-layout { flex-direction: column; }
+  .sd-try-panel { width: 100%; position: static; }
+}
+
+/* ── SharedProjectDoc (spd) ───────────────────────────────────────────────── */
+.spd-page { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+.spd-project-title {
+  display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
+}
+.spd-project-title h1 {
+  font-size: 15px; font-weight: 700; margin: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.spd-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 12px; flex-shrink: 0;
+}
+.spd-badge.public  { background: rgba(34,211,160,0.1); color: #22d3a0; }
+.spd-badge.protected { background: rgba(249,115,22,0.1); color: #f97316; }
+.spd-meta { font-size: 12px; color: var(--text-muted); white-space: nowrap; align-self: center; }
+
+/* ── Layout ── */
+.spd-layout {
+  display: flex; flex: 1; overflow: hidden; min-height: 0;
+  width: 100%;
+}
+
+/* ── TOC ── */
+.spd-toc {
+  width: 240px; min-width: 240px; border-right: 1px solid var(--border);
+  background: var(--bg-secondary); overflow-y: auto; padding: 16px 0;
+  flex-shrink: 0; position: sticky; top: 49px; height: calc(100vh - 49px);
+}
+.spd-toc-title {
+  padding: 0 14px 10px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light); margin-bottom: 6px;
+}
+.spd-toc-section { margin-bottom: 4px; }
+.spd-toc-root { padding: 4px 14px; font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); }
+.spd-toc-folder {
+  display: flex; align-items: center; gap: 5px; width: 100%;
+  text-align: left; padding: 5px 14px; font-size: 12px; font-weight: 600;
+  color: var(--text-secondary); background: transparent; border: none; cursor: pointer;
+  transition: background 0.15s;
+}
+.spd-toc-folder:hover { background: var(--bg-hover); }
+.spd-toc-folder > span:nth-child(2) { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.spd-toc-count { font-size: 10px; color: var(--text-muted); flex-shrink: 0; }
+.spd-toc-item {
+  display: flex; align-items: center; gap: 5px; text-decoration: none;
+  padding: 4px 14px 4px 22px; font-size: 11px; color: var(--text-muted);
+  transition: background 0.15s, color 0.15s;
+}
+.spd-toc-item:hover { background: var(--bg-hover); color: var(--accent); }
+.spd-toc-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Main content ── */
+.spd-main { flex: 1; overflow-y: auto; background: var(--bg-primary); min-height: 0; }
+.spd-doc-body { max-width: 860px; margin: 0 auto; padding: 32px 40px 80px; }
+
+.spd-intro { margin-bottom: 36px; padding-bottom: 24px; border-bottom: 2px solid var(--border); }
+.spd-intro h1 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+.spd-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+.spd-tip {
+  font-size: 13px; color: var(--text-secondary);
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 14px; display: inline-block;
+}
+
+.spd-section { margin-bottom: 48px; }
+.spd-folder-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 0; border-bottom: 2px solid var(--border); margin-bottom: 20px;
+}
+.spd-folder-header h2 { font-size: 18px; font-weight: 700; margin: 0; flex: 1; }
+.spd-folder-count {
+  font-size: 11px; color: var(--accent); background: var(--accent-dim);
+  padding: 2px 9px; border-radius: 12px; font-weight: 600;
+}
+
+/* ── Endpoint card ── */
+.spd-endpoint {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  margin-bottom: 28px; overflow: hidden; scroll-margin-top: 70px;
+  transition: border-color 0.2s;
+}
+.spd-endpoint-active { border-color: var(--accent); }
+.spd-endpoint-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+.spd-endpoint-url {
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--text-secondary); flex: 1; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.spd-endpoint-name { font-size: 12px; color: var(--text-muted); }
+.spd-try-btn { margin-left: auto; flex-shrink: 0; }
+
+/* ── Live try result ── */
+.spd-try-result {
+  padding: 12px 16px; background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border); animation: slideDown 0.2s ease;
+}
+.spd-try-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+.spd-auth-input { flex: 1; min-width: 180px; max-width: 320px; font-size: 12px; }
+.spd-try-body {
+  font-family: var(--font-mono); font-size: 12px;
+  background: var(--bg-primary); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px; overflow: auto;
+  max-height: 280px; white-space: pre; color: var(--text-secondary);
+}
+
+/* ── Markdown ── */
+.spd-markdown { padding: 20px 24px; }
+.spd-markdown p { margin: 0 0 10px; font-size: 14px; line-height: 1.7; }
+.spd-markdown h2 { font-size: 15px; font-weight: 600; margin: 14px 0 6px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.spd-markdown h3 { font-size: 13px; font-weight: 600; margin: 12px 0 4px; color: var(--accent); }
+.spd-markdown code:not(pre code) { font-family: var(--font-mono); font-size: 12px; background: var(--bg-tertiary); padding: 2px 5px; border-radius: 4px; color: var(--cyan); }
+.spd-markdown pre { margin: 10px 0; border-radius: var(--radius-sm); overflow: auto; font-size: 12px; }
+.spd-markdown table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 10px 0; }
+.spd-markdown th { background: var(--bg-tertiary); padding: 7px 12px; text-align: left; border: 1px solid var(--border); font-size: 12px; }
+.spd-markdown td { padding: 6px 12px; border: 1px solid var(--border); font-size: 13px; }
+.spd-markdown tr:nth-child(even) td { background: var(--bg-secondary); }
+.spd-markdown ul, .spd-markdown ol { padding-left: 20px; margin: 6px 0; }
+.spd-markdown li { margin-bottom: 4px; font-size: 14px; line-height: 1.6; }
+.spd-markdown blockquote { border-left: 3px solid var(--accent); padding-left: 12px; margin: 8px 0; color: var(--text-muted); font-style: italic; }
+
+/* ── Footer ── */
+.spd-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 0; border-top: 1px solid var(--border);
+  margin-top: 40px; font-size: 12px; color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+  .spd-toc { display: none; }
+  .spd-doc-body { padding: 20px 16px 60px; }
+}
